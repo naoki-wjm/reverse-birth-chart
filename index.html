@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reverse Birth Chart — Find a Birthday by Zodiac Signs</title>
+<meta name="description" content="Specify zodiac sign placements and find birth dates that match. A unique tool for fiction writers, RPG players, and astrology enthusiasts.">
+<meta property="og:title" content="Reverse Birth Chart — Find a Birthday by Zodiac Signs">
+<meta property="og:description" content="Specify zodiac sign placements and find birth dates that match. A unique tool for fiction writers, RPG players, and astrology enthusiasts.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Reverse Birth Chart — Find a Birthday by Zodiac Signs">
+<meta name="twitter:description" content="Specify zodiac sign placements and find birth dates that match. A unique tool for fiction writers, RPG players, and astrology enthusiasts.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
+
+  :root {
+    --bg-deep: #0e0e1a;
+    --bg-card: #1c1c30;
+    --bg-input: #252540;
+    --border: #444466;
+    --border-glow: #7a6abb;
+    --text: #eae8f2;
+    --text-dim: #b0adc4;
+    --text-bright: #ffffff;
+    --gold: #e8c860;
+    --gold-dim: #c8a848;
+    --purple: #aa8ee8;
+    --purple-dim: #6650a0;
+    --sign-fire: #e88070;
+    --sign-earth: #88c478;
+    --sign-air: #78b0e0;
+    --sign-water: #7888e0;
+    --match-full: #e8c860;
+    --match-high: #a8d878;
+    --match-mid: #78b0e0;
+    --match-low: #b0adc4;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-deep);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(74, 58, 122, 0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(90, 60, 140, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(201, 168, 76, 0.03) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* -- Header -- */
+  header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 1.8rem;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.3rem;
+  }
+
+  header p {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+
+  header .subtitle {
+    margin-top: 0.8rem;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* -- Sections -- */
+  .section {
+    margin-bottom: 2rem;
+  }
+
+  .section-title {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* -- Planet rows -- */
+  .planet-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .planet-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 120px;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.6rem 0.8rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    transition: border-color 0.2s;
+  }
+
+  .planet-row:hover {
+    border-color: var(--border-glow);
+  }
+
+  .planet-row.required {
+    border-left: 3px solid var(--gold-dim);
+  }
+
+  .planet-name {
+    font-weight: 400;
+    font-size: 0.9rem;
+    color: var(--text-bright);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .planet-symbol {
+    font-size: 1.1rem;
+    width: 1.4rem;
+    text-align: center;
+  }
+
+  .planet-row select {
+    width: 100%;
+    padding: 0.45rem 0.6rem;
+    background: var(--bg-input);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%237a7690'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    padding-right: 1.8rem;
+  }
+
+  .planet-row select:focus {
+    outline: none;
+    border-color: var(--purple);
+  }
+
+  .priority-toggle {
+    display: flex;
+    gap: 0.3rem;
+  }
+
+  .priority-btn {
+    flex: 1;
+    padding: 0.35rem 0.4rem;
+    font-size: 0.72rem;
+    font-family: inherit;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg-input);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+
+  .priority-btn.active {
+    background: var(--purple-dim);
+    border-color: var(--purple);
+    color: var(--text-bright);
+  }
+
+  .priority-btn:hover:not(.active) {
+    border-color: var(--border-glow);
+  }
+
+  /* -- Year range -- */
+  .year-range {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+
+  .year-input {
+    width: 120px;
+    padding: 0.5rem 0.7rem;
+    background: var(--bg-input);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  .year-input:focus {
+    outline: none;
+    border-color: var(--purple);
+  }
+
+  .year-sep {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+  }
+
+  .year-hint {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    width: 100%;
+    margin-top: 0.3rem;
+  }
+
+  /* -- Search button -- */
+  .search-area {
+    text-align: center;
+    margin: 2rem 0;
+  }
+
+  .search-btn {
+    padding: 0.8rem 3rem;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--bg-deep);
+    background: linear-gradient(135deg, var(--gold), #d4b85c);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+
+  .search-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(201, 168, 76, 0.3);
+  }
+
+  .search-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* -- Progress -- */
+  .progress-area {
+    margin: 1.5rem 0;
+    display: none;
+  }
+
+  .progress-area.active {
+    display: block;
+  }
+
+  .progress-bar-outer {
+    width: 100%;
+    height: 4px;
+    background: var(--bg-input);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-bar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, var(--purple), var(--gold));
+    border-radius: 2px;
+    transition: width 0.1s;
+    width: 0%;
+  }
+
+  .progress-text {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 0.4rem;
+  }
+
+  /* -- Results -- */
+  .results-area {
+    display: none;
+  }
+
+  .results-area.active {
+    display: block;
+  }
+
+  .results-summary {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .result-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 0.8rem;
+    transition: border-color 0.2s;
+  }
+
+  .result-card:hover {
+    border-color: var(--border-glow);
+  }
+
+  .result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.6rem;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .result-date {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--text-bright);
+  }
+
+  .result-match {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-weight: 500;
+  }
+
+  .match-full { background: rgba(201, 168, 76, 0.2); color: var(--match-full); }
+  .match-high { background: rgba(138, 184, 90, 0.15); color: var(--match-high); }
+  .match-mid  { background: rgba(90, 140, 184, 0.15); color: var(--match-mid); }
+  .match-low  { background: rgba(122, 118, 144, 0.15); color: var(--match-low); }
+
+  .result-planets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    line-height: 1.6;
+  }
+
+  .result-planet {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .result-planet.matched {
+    color: var(--gold);
+  }
+
+  .result-planet.unmatched {
+    color: var(--text-dim);
+  }
+
+  .result-time-hint {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border);
+    font-style: italic;
+  }
+
+  /* -- Status / Error -- */
+  .status-msg {
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+
+  .status-msg.error {
+    color: var(--sign-fire);
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+  }
+
+  /* -- Footer -- */
+  footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+
+  footer a {
+    color: var(--purple);
+    text-decoration: none;
+  }
+
+  /* -- Responsive -- */
+  @media (max-width: 600px) {
+    .container { padding: 1.2rem 1rem 3rem; }
+    header h1 { font-size: 1.4rem; }
+    .planet-row {
+      grid-template-columns: 80px 1fr;
+      grid-template-rows: auto auto;
+    }
+    .priority-toggle {
+      grid-column: 1 / -1;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>&#10022; Reverse Birth Chart &#10022;</h1>
+    <p>Find a birthday that matches specific zodiac placements</p>
+    <div class="subtitle">
+      Choose zodiac signs for each planet and search for dates when that combination occurs.<br>
+      Perfect for creating fictional characters with astrologically consistent birthdays.<br>
+      <span style="margin-top:0.4rem; display:inline-block;">Not sure which signs to pick? Try the <a href="./guide.html" style="color:var(--purple);">Personality Guide</a></span>
+    </div>
+  </header>
+
+  <div id="wasmStatus" class="status-msg">
+    &#9203; Loading calculation engine...
+  </div>
+
+  <div id="mainForm" style="display:none;">
+
+    <div class="section">
+      <div class="section-title">Planet Sign Selection</div>
+      <div class="planet-grid" id="planetGrid"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Year Range</div>
+      <div class="year-range">
+        <input type="number" class="year-input" id="yearStart" value="2000" min="-3000" max="3000">
+        <span class="year-sep">to</span>
+        <input type="number" class="year-input" id="yearEnd" value="2009" min="-3000" max="3000">
+        <div class="year-hint">Max 10-year span. For wider ranges, search in multiple passes. Supports 3000 BCE to 3000 CE.</div>
+      </div>
+    </div>
+
+    <div class="search-area">
+      <button class="search-btn" id="searchBtn">Search</button>
+    </div>
+
+    <div class="progress-area" id="progressArea">
+      <div class="progress-bar-outer">
+        <div class="progress-bar-inner" id="progressBar"></div>
+      </div>
+      <div class="progress-text" id="progressText">Preparing...</div>
+    </div>
+
+    <div class="results-area" id="resultsArea">
+      <div class="section-title">Results</div>
+      <div class="results-summary" id="resultsSummary"></div>
+      <div id="resultsList"></div>
+    </div>
+
+  </div>
+
+  <footer>
+    Powered by <a href="https://github.com/ptprashanttripathi/sweph-wasm" target="_blank" rel="noopener">sweph-wasm</a> (Swiss Ephemeris WebAssembly)<br>
+    All calculations run in your browser. No data is sent to any server.<br>
+    <a href="https://github.com/naoki-wjm/reverse-birth-chart" target="_blank" rel="noopener">Source Code (AGPL-3.0)</a>
+    &#xFF5C; Based on <a href="https://astro-tool-nine.vercel.app/reverse.html" target="_blank" rel="noopener">astro-tool</a> (Japanese)
+  </footer>
+
+</div>
+
+<script type="module" src="/src/reverse.js"></script>
+</body>
+</html>
