@@ -1,6 +1,8 @@
 # Reverse Birth Chart
 
-**Find a birth date that produces specific zodiac sign placements.**
+**[Live Demo](https://reverse-birth-chart-five.vercel.app/)**
+
+Find a birth date that produces specific zodiac sign placements.
 
 Most astrology tools go from birthday to chart. This one goes the other way: you pick the signs you want, and it finds dates that match.
 
